@@ -196,17 +196,15 @@ public class JavaClean {
             }
         }
         else if(bundleType.equals("fileBundle")) {
-            String newPath = path + "/" + bundleToMove.bundleName;
             boolean directoryFound = false;
-            
-            Collections.sort(bundleToMove.files, new CompareFiles());
             
             for(int i = 0; i < bundleToMove.files.size(); i++) {
                 File currentFile = bundleToMove.files.get(i);
-                if(currentFile.renameTo(new File(newPath + currentFile.getName())))
+                if(currentFile.renameTo(new File(path + "/" + currentFile.getName())))
                     System.out.println("Moved " + currentFile.getName());
                 else
                     System.out.println("Can't move " + currentFile.getName());
+                    System.out.println(path + currentFile.getName());
             }
         }
     }
