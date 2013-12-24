@@ -3,7 +3,6 @@
  * and open the template in the editor.
  */
 package javaclean;
-import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 /**

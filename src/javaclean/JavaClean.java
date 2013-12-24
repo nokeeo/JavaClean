@@ -7,12 +7,10 @@ package javaclean;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.awt.*;
 import javax.swing.*;
 
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import static java.nio.file.StandardCopyOption.*;
 
 /**
  *
