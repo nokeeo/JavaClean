@@ -4,13 +4,15 @@
  */
 package javaclean;
 
-import java.io.File;
+import java.io.*;
 import java.util.*;
-import javaclean.FileBundle;
-import javaclean.CompareFiles;
 import java.text.SimpleDateFormat;
 import java.awt.*;
 import javax.swing.*;
+
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import static java.nio.file.StandardCopyOption.*;
 
 /**
  *
@@ -88,47 +90,53 @@ public class JavaClean {
         
         ArrayList<FileBundle> yearBundles = new ArrayList<FileBundle>();
         
-       
-        File folder = new File(targetPath + "/");
+        Path sourceDir = Paths.get(targetPath + "/");
+        DirectoryStream<Path> stream;
+        try {
+            stream = Files.newDirectoryStream(sourceDir);
         
-        File[] files = folder.listFiles();
-        
-        for(int i = 0; i < files.length; i++) {
-            File currentFile = files[i];
-            String currentFileName = currentFile.getName();
-            if(!currentFile.isDirectory()) {
-                FileBundle currentYearFileBundle = JavaClean.getYearBundle(yearBundles, currentFile.lastModified());
-                
-                int fileExtIndex = currentFileName.lastIndexOf(".");
-                if(fileExtIndex != -1) {
-                    String currentFileType = currentFileName.substring(fileExtIndex);
-                    if(imageTypes.contains(currentFileType)) {
-                        FileBundle imageBundle = currentYearFileBundle.getDirectoryByName("Pictures");
-                        imageBundle.files.add(currentFile);
-                    }
-                    else if(docTypes.contains(currentFileType)) {
-                        FileBundle docBundle = currentYearFileBundle.getDirectoryByName("Documents");
-                        docBundle.files.add(currentFile);
-                    }
-                    else if(audioTypes.contains(currentFileType)) {
-                        FileBundle audioBundle = currentYearFileBundle.getDirectoryByName("Audio");
-                        audioBundle.files.add(currentFile);
-                    }
-                    else if(videoTypes.contains(currentFileType)) {
-                        FileBundle videoBundle = currentYearFileBundle.getDirectoryByName("Video");
-                        videoBundle.files.add(currentFile);
-                    }
-                    else {
-                        if(!currentFileName.equals(".DS_Store")) {
-                            FileBundle otherBundle = currentYearFileBundle.getDirectoryByName("Other");
-                            otherBundle.files.add(currentFile);
+            for(Path currentFile : stream) {
+                String currentFileName = currentFile.getFileName().toString();
+                BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
+
+                if(!fileAttributes.isDirectory()) {
+                    FileBundle currentYearFileBundle = JavaClean.getYearBundle(yearBundles, fileAttributes.lastModifiedTime().toMillis());
+
+                    int fileExtIndex = currentFileName.lastIndexOf(".");
+                    if(fileExtIndex != -1) {
+                        String currentFileType = currentFileName.substring(fileExtIndex);
+                        if(imageTypes.contains(currentFileType)) {
+                            FileBundle imageBundle = currentYearFileBundle.getDirectoryByName("Pictures");
+                            imageBundle.files.add(currentFile);
                         }
+                        else if(docTypes.contains(currentFileType)) {
+                            FileBundle docBundle = currentYearFileBundle.getDirectoryByName("Documents");
+                            docBundle.files.add(currentFile);
+                        }
+                        else if(audioTypes.contains(currentFileType)) {
+                            FileBundle audioBundle = currentYearFileBundle.getDirectoryByName("Audio");
+                            audioBundle.files.add(currentFile);
+                        }
+                        else if(videoTypes.contains(currentFileType)) {
+                            FileBundle videoBundle = currentYearFileBundle.getDirectoryByName("Video");
+                            videoBundle.files.add(currentFile);
+                        }
+                        else {
+                            if(!currentFileName.equals(".DS_Store")) {
+                                FileBundle otherBundle = currentYearFileBundle.getDirectoryByName("Other");
+                                otherBundle.files.add(currentFile);
+                            }
+                        }
+
                     }
-                    
                 }
             }
-        }
         
+        }
+       
+        catch(IOException | DirectoryIteratorException e) {
+            System.err.println(e);
+        }
         /*for(int i = 0; i < yearBundles.size(); i++) {
             FileBundle currentBundle = yearBundles.get(i);
             System.out.println(currentBundle.bundleName);
@@ -185,13 +193,16 @@ public class JavaClean {
                     }
                 }
                 if(!directoryFound) {
-                    String newPath = path + "/" + currentBundle.bundleName;
-                    System.out.println(currentBundle.getBundleType() + " " + currentBundle.bundleName);
-                    File newDirectory = new File(newPath);
-                    newDirectory.mkdir();
-                        
-                    JavaClean.moveFiles(currentBundle, newPath);
+                    Path newPath = Paths.get(path + "/" + currentBundle.bundleName);
+                    try {
+                        Files.createDirectory(newPath);
+                        System.out.println(currentBundle.getBundleType() + " " + currentBundle.bundleName);
+                        JavaClean.moveFiles(currentBundle, newPath.toString());
+                    }
                     
+                    catch(IOException e) {
+                        System.err.println(e);
+                    }
                 }
             }
         }
@@ -199,12 +210,15 @@ public class JavaClean {
             boolean directoryFound = false;
             
             for(int i = 0; i < bundleToMove.files.size(); i++) {
-                File currentFile = bundleToMove.files.get(i);
-                if(currentFile.renameTo(new File(path + "/" + currentFile.getName())))
-                    System.out.println("Moved " + currentFile.getName());
-                else
-                    System.out.println("Can't move " + currentFile.getName());
-                    System.out.println(path + currentFile.getName());
+                Path currentFile = bundleToMove.files.get(i);
+                
+                try {
+                    Files.move(currentFile, Paths.get(path + "/" + currentFile.getFileName()));
+                }
+                
+                catch(IOException | SecurityException e) {
+                    System.out.println("Count not move " + currentFile.getFileName().toString());
+                }
             }
         }
     }

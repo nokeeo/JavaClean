@@ -4,6 +4,7 @@
  */
 package javaclean;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 /**
  *
@@ -12,13 +13,13 @@ import java.util.*;
 public class FileBundle {
     public String bundleName;
     private String bundleType = "fileBundle";
-    public ArrayList<File> files;
+    public ArrayList<Path> files;
     public ArrayList<FileBundle> directories;
     
     public FileBundle(String name, String type) {
         this.bundleName = name;
         this.setBundelType(type);
-        this.files = new ArrayList<File>();
+        this.files = new ArrayList<Path>();
         this.directories = new ArrayList<FileBundle>();
     }
     
@@ -43,7 +44,7 @@ public class FileBundle {
             this.bundleType = type;
         }
         else if(type.equals("directoryBundle")) {
-            this.files = new ArrayList<File>();
+            this.files = new ArrayList<Path>();
             this.bundleType = type;
         }
     }
