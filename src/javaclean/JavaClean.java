@@ -11,6 +11,10 @@ import javax.swing.*;
 
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.jnlp.*;
 
 /**
  *
@@ -22,6 +26,14 @@ public class JavaClean {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
+        try { 
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); 
+        } 
+        
+        catch(Exception e) { 
+            System.err.println(e); 
+        }
         
         String targetPath = "";
         String destinationPath = "";
@@ -135,24 +147,18 @@ public class JavaClean {
         catch(IOException | DirectoryIteratorException e) {
             System.err.println(e);
         }
-        /*for(int i = 0; i < yearBundles.size(); i++) {
-            FileBundle currentBundle = yearBundles.get(i);
-            System.out.println(currentBundle.bundleName);
-            for(int k = 0; k < currentBundle.directories.size(); k++) {
-                System.out.println(currentBundle.directories.get(k).bundleName);
-                
-                
-               
-            }
-        }*/
         
         for(int i = 0; i < yearBundles.size(); i++) {
             FileBundle currentYearBundle = yearBundles.get(i);
             System.out.println(currentYearBundle.getBundleType() + " " + currentYearBundle.bundleName);
-            File newDirectory = new File(destinationPath + "/" + currentYearBundle.bundleName);
-            newDirectory.mkdir();
-            
-            JavaClean.moveFiles(currentYearBundle, destinationPath + "/" + currentYearBundle.bundleName);
+            Path newDirectory = Paths.get(destinationPath + "/" + currentYearBundle.bundleName);
+            try{
+                Files.createDirectories(newDirectory);
+                currentYearBundle.moveFiles(destinationPath + "/" + currentYearBundle.bundleName);
+            }
+            catch(IOException e) {
+                System.err.println(e);
+            }
         }
     }
     
@@ -167,57 +173,5 @@ public class JavaClean {
         FileBundle newBundle = new FileBundle(yearString, "directoryBundle", "archieve");
         yearBundles.add(newBundle);
         return newBundle;
-    }
-    
-    public static void moveFiles(FileBundle bundleToMove, String path) {
-        File moveDirectory = new File(path);
-        File[] checkFiles = moveDirectory.listFiles();
-        
-        String bundleType = bundleToMove.getBundleType();
-        if(bundleType.equals("directoryBundle")) {
-            for(int i = 0; i < bundleToMove.directories.size(); i++) {
-                FileBundle currentBundle = bundleToMove.directories.get(i);
-                //Check if the directory exists.
-                boolean directoryFound = false;
-                if(checkFiles != null) {
-                    for(int k = 0; k < checkFiles.length; k++) {
-                        File currentCheckFile = checkFiles[k];
-                        if(currentCheckFile.getName().equals(currentBundle.bundleName)) {
-                            String newPath = path + "/" + currentBundle.bundleName;
-                            JavaClean.moveFiles(currentBundle, newPath.format(newPath , currentBundle.bundleName));
-                            directoryFound = true;
-                            break;
-                        }
-                    }
-                }
-                if(!directoryFound) {
-                    Path newPath = Paths.get(path + "/" + currentBundle.bundleName);
-                    try {
-                        Files.createDirectory(newPath);
-                        System.out.println(currentBundle.getBundleType() + " " + currentBundle.bundleName);
-                        JavaClean.moveFiles(currentBundle, newPath.toString());
-                    }
-                    
-                    catch(IOException e) {
-                        System.err.println(e);
-                    }
-                }
-            }
-        }
-        else if(bundleType.equals("fileBundle")) {
-            boolean directoryFound = false;
-            
-            for(int i = 0; i < bundleToMove.files.size(); i++) {
-                Path currentFile = bundleToMove.files.get(i);
-                
-                try {
-                    Files.move(currentFile, Paths.get(path + "/" + currentFile.getFileName()));
-                }
-                
-                catch(IOException | SecurityException e) {
-                    System.out.println("Count not move " + currentFile.getFileName().toString());
-                }
-            }
-        }
     }
 }

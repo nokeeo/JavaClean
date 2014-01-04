@@ -3,6 +3,7 @@
  * and open the template in the editor.
  */
 package javaclean;
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 /**
@@ -56,5 +57,42 @@ public class FileBundle {
         }
         
         return null;
+    }
+    
+    public void moveFiles(String path) {
+        String bundleType = this.getBundleType();
+        if(bundleType.equals("directoryBundle")) {
+            for(int i = 0; i < this.directories.size(); i++) {
+                FileBundle currentBundle = this.directories.get(i);
+                //Check if the directory exists.
+                boolean directoryFound = false;
+                Path newPath = Paths.get(path + "/" + currentBundle.bundleName);
+                if(!Files.exists(newPath)) {
+                    try {
+                        Files.createDirectory(newPath);
+                    }
+                    
+                    catch(IOException e) {
+                        System.err.println(e);
+                    }
+                }
+                currentBundle.moveFiles(newPath.toString());
+            }
+        }
+        else if(bundleType.equals("fileBundle")) {
+            boolean directoryFound = false;
+            
+            for(int i = 0; i < this.files.size(); i++) {
+                Path currentFile = this.files.get(i);
+                
+                try {
+                    Files.move(currentFile, Paths.get(path + "/" + currentFile.getFileName()));
+                }
+                
+                catch(IOException | SecurityException e) {
+                    System.out.println("Count not move " + currentFile.getFileName().toString());
+                }
+            }
+        }
     }
 }
