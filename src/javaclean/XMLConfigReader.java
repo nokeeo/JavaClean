@@ -69,9 +69,11 @@ public class XMLConfigReader {
                 }
         }
         
-        if(type.equals("year")) {
+        else if(type.equals("year"))
             returnStructure = new YearDirectoryStructure(null);
-        }
+        
+        else if(type.equals("month"))
+            returnStructure = new MonthDirectoryStructure(null);
         
         return returnStructure;
     }
