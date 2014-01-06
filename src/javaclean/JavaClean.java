@@ -11,10 +11,6 @@ import javax.swing.*;
 
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.jnlp.*;
 
 /**
  *
@@ -35,14 +31,32 @@ public class JavaClean {
             System.err.println(e); 
         }
         
+        String configPath = "";
         String targetPath = "";
         String destinationPath = "";
+        DirectoryStructure directoryStructure;
         
-        JOptionPane.showMessageDialog(null, "Select Target Directory");
+        JOptionPane.showMessageDialog(null, "Select Config File");
         JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         int fcReturn = fc.showOpenDialog(null);
+        
+        if(fcReturn == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fc.getSelectedFile();
+            configPath = selectedFile.getAbsolutePath();
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Operation aborted!!");
+            System.exit(0);
+        }
+        
+        directoryStructure = XMLConfigReader.parseFile(configPath);
+        
+        JOptionPane.showMessageDialog(null, "Select Target Directory");
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        fcReturn = fc.showOpenDialog(null);
         
         if(fcReturn == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fc.getSelectedFile();
@@ -65,41 +79,6 @@ public class JavaClean {
             System.exit(0);
         }
         
-        ArrayList<String> imageTypes = new ArrayList<String>();
-        imageTypes.add(".img");
-        imageTypes.add(".png");
-        imageTypes.add(".jpg");
-        imageTypes.add(".jpeg");
-        imageTypes.add(".raw");
-        imageTypes.add(".gif");
-        imageTypes.add(".bmp");
-        imageTypes.add(".bmp");
-        
-        ArrayList<String> docTypes = new ArrayList<String>();
-        docTypes.add(".doc");
-        docTypes.add(".docx");
-        docTypes.add(".pages");
-        docTypes.add(".ppt");
-        docTypes.add(".pptx");
-        docTypes.add(".keynote");
-        docTypes.add(".pdf");
-        
-        ArrayList<String> audioTypes = new ArrayList<String>();
-        audioTypes.add(".mp3");
-        audioTypes.add(".m4a");
-        audioTypes.add(".m4p");
-        audioTypes.add(".alac");
-        audioTypes.add(".wav");
-        audioTypes.add(".flac");
-        
-        ArrayList<String> videoTypes = new ArrayList<String>();
-        videoTypes.add(".mov");
-        videoTypes.add(".m4v");
-        videoTypes.add(".wmv");
-        videoTypes.add(".mp4");
-        
-        ArrayList<FileBundle> yearBundles = new ArrayList<FileBundle>();
-        
         Path sourceDir = Paths.get(targetPath + "/");
         DirectoryStream<Path> stream;
         try {
@@ -110,34 +89,16 @@ public class JavaClean {
                 BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
 
                 if(!fileAttributes.isDirectory()) {
-                    FileBundle currentYearFileBundle = JavaClean.getYearBundle(yearBundles, fileAttributes.lastModifiedTime().toMillis());
-
-                    int fileExtIndex = currentFileName.lastIndexOf(".");
-                    if(fileExtIndex != -1) {
-                        String currentFileType = currentFileName.substring(fileExtIndex);
-                        if(imageTypes.contains(currentFileType)) {
-                            FileBundle imageBundle = currentYearFileBundle.getDirectoryByName("Pictures");
-                            imageBundle.files.add(currentFile);
+                    String moveLocation = directoryStructure.getNextPath(currentFile);
+                    if(moveLocation != null) {
+                        Path movePath = Paths.get(destinationPath + "/" + moveLocation);
+                        try {
+                            Files.createDirectories(movePath);
+                            Files.move(currentFile, Paths.get(destinationPath + "/" + moveLocation + currentFileName));
                         }
-                        else if(docTypes.contains(currentFileType)) {
-                            FileBundle docBundle = currentYearFileBundle.getDirectoryByName("Documents");
-                            docBundle.files.add(currentFile);
+                        catch(IOException e) {
+                            System.err.println(e);
                         }
-                        else if(audioTypes.contains(currentFileType)) {
-                            FileBundle audioBundle = currentYearFileBundle.getDirectoryByName("Audio");
-                            audioBundle.files.add(currentFile);
-                        }
-                        else if(videoTypes.contains(currentFileType)) {
-                            FileBundle videoBundle = currentYearFileBundle.getDirectoryByName("Video");
-                            videoBundle.files.add(currentFile);
-                        }
-                        else {
-                            if(!currentFileName.equals(".DS_Store")) {
-                                FileBundle otherBundle = currentYearFileBundle.getDirectoryByName("Other");
-                                otherBundle.files.add(currentFile);
-                            }
-                        }
-
                     }
                 }
             }
@@ -147,31 +108,5 @@ public class JavaClean {
         catch(IOException | DirectoryIteratorException e) {
             System.err.println(e);
         }
-        
-        for(int i = 0; i < yearBundles.size(); i++) {
-            FileBundle currentYearBundle = yearBundles.get(i);
-            System.out.println(currentYearBundle.getBundleType() + " " + currentYearBundle.bundleName);
-            Path newDirectory = Paths.get(destinationPath + "/" + currentYearBundle.bundleName);
-            try{
-                Files.createDirectories(newDirectory);
-                currentYearBundle.moveFiles(destinationPath + "/" + currentYearBundle.bundleName);
-            }
-            catch(IOException e) {
-                System.err.println(e);
-            }
-        }
-    }
-    
-    public static FileBundle getYearBundle(ArrayList<FileBundle> yearBundles, long year) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
-        String yearString = sdf.format(year);
-        for(int i = 0; i < yearBundles.size(); i++) {
-            FileBundle currentFileBundle = yearBundles.get(i);
-            if(currentFileBundle.bundleName.equals(yearString))
-                return currentFileBundle;
-        }
-        FileBundle newBundle = new FileBundle(yearString, "directoryBundle", "archieve");
-        yearBundles.add(newBundle);
-        return newBundle;
     }
 }
