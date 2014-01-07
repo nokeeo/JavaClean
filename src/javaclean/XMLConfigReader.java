@@ -48,11 +48,37 @@ public class XMLConfigReader {
                     dirStructure = getDirectoryStructureForType(node, typeNode);
                     directory.subDirectories.add(dirStructure);
                 }
+                else {
+                    Node nameNode = node.getAttributes().getNamedItem("name");
+                    if(nameNode != null) {
+                        dirStructure = new FolderDirectoryStructure(nameNode.getNodeValue());
+                        directory.subDirectories.add(dirStructure);
+                    }
+                    else {
+                        System.err.println("The directory element at " + node.getUserData("lineNumber") + " must have a name");
+                    }
+                }
                 
                 parseDirectoryChildren(node, dirStructure);
             }
         }
+        
+        else if(node.getNodeName().equals("file")) {
+            FileStructure newFileStructure = parseFileNode(node);
+            directory.fileStructures.add(newFileStructure);
+        }
         return directory;
+    }
+    
+    public static FileStructure parseFileNode(Node fileNode) {
+        FileStructure file = new FileStructure();
+        NodeList fileProperties = fileNode.getChildNodes();
+        for(int i = 0; i < fileProperties.getLength(); i++) {
+            FileProperty newProperty = parseFilePropertyNode(fileProperties.item(i));
+            if(newProperty != null)
+                file.properties.add(newProperty);
+        }
+        return file;
     }
     
     private static DirectoryStructure getDirectoryStructureForType(Node directoryNode, Node typeNode) {
@@ -84,5 +110,19 @@ public class XMLConfigReader {
             Node child = children.item(i);
             XMLConfigReader.parseDirectoryNode(child, parentDirectory);
         }
+    }
+    
+    private static FileProperty parseFilePropertyNode(Node property) {
+        String propertyName = property.getNodeName().toLowerCase();
+        String propertyValue = property.getTextContent();
+        
+        if(propertyName.equals("contains"))
+            return new ContainsFileProperty(propertyValue);
+        else if(propertyName.equals("startswith"))
+            return new StartsWithFileProperty(propertyValue);
+        else if(propertyName.equals("filetype"))
+            return new FileTypeFileProperty(propertyValue);
+        else
+            return null;
     }
 }
