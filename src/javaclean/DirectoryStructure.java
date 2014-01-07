@@ -33,15 +33,26 @@ public abstract class DirectoryStructure {
                 return null;
         }
         
-        for(DirectoryStructure subDirectory : subDirectories) {
+        if(subDirectories.isEmpty())
+            return getCurrentDirectoryName(originalPath) + "/";
+        
+        boolean matchFound = true;
+        String nextPath = null;
+        for(DirectoryStructure subDirectory : subDirectories) { 
             if(subDirectory.checkForPathMatch(originalPath)) {
-                String nextPath = subDirectory.getNextPath(originalPath);
+                nextPath = subDirectory.getNextPath(originalPath);
                 if(nextPath == null)
-                    return null;
-                return getCurrentDirectoryName(originalPath) + "/" + nextPath;
+                    matchFound = false;
+                else {
+                    matchFound = true;
+                    break;
+                }
             }
         }
-        return getCurrentDirectoryName(originalPath) + "/";
+        if(matchFound == false)
+            return null;
+        return getCurrentDirectoryName(originalPath) + "/" + nextPath;
+        
     }
     
     private boolean checkFileStructures(Path originalPath) {

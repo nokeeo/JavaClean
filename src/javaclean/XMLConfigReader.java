@@ -101,6 +101,9 @@ public class XMLConfigReader {
         else if(type.equals("month"))
             returnStructure = new MonthDirectoryStructure(null);
         
+        else if(type.equals("day"))
+            returnStructure = new DayDirectoryStructure(null);
+        
         return returnStructure;
     }
     
