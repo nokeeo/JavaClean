@@ -45,6 +45,7 @@ public class SelectPathsFrame extends javax.swing.JFrame {
         clearButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Java Clean");
 
         sourcePathTextField.setEditable(false);
         sourcePathTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -188,6 +189,9 @@ public class SelectPathsFrame extends javax.swing.JFrame {
         String path = this.selectFile(this.configPathTextField);
         if(path != null)
             this.configPathTextField.setText(path);
+        
+        if(this.checkTextFields())
+            this.setFocus(this.sortButton);
     }//GEN-LAST:event_selectConfigButtonActionPerformed
 
     private void configPathTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configPathTextFieldActionPerformed
@@ -199,6 +203,9 @@ public class SelectPathsFrame extends javax.swing.JFrame {
         String path = this.selectFile(this.sourcePathTextField);
         if(path != null)
             this.sourcePathTextField.setText(path);
+        
+        if(this.checkTextFields())
+            this.setFocus(this.sortButton);
     }//GEN-LAST:event_selectSourceButtonActionPerformed
 
     private void destinationPathTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_destinationPathTextFieldActionPerformed
@@ -210,6 +217,9 @@ public class SelectPathsFrame extends javax.swing.JFrame {
         String path = this.selectFile(this.destinationPathTextField);
         if(path != null)
             this.destinationPathTextField.setText(path);
+        
+        if(this.checkTextFields())
+            this.setFocus(this.sortButton);
     }//GEN-LAST:event_selectDestinationButtonActionPerformed
 
     private void sortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortButtonActionPerformed
@@ -271,22 +281,9 @@ public class SelectPathsFrame extends javax.swing.JFrame {
             return true;
     }
     
-    private void disableButtons() {
-        this.selectConfigButton.setEnabled(false);
-        this.selectSourceButton.setEnabled(false);
-        this.selectDestinationButton.setEnabled(false);
-        this.exitButton.setEnabled(false);
-        this.clearButton.setEnabled(false);
-        this.sortButton.setEnabled(false);
-    }
-    
-    private void enableButtons() {
-        this.selectConfigButton.setEnabled(true);
-        this.selectSourceButton.setEnabled(true);
-        this.selectDestinationButton.setEnabled(true);
-        this.exitButton.setEnabled(true);
-        this.clearButton.setEnabled(true);
-        this.sortButton.setEnabled(true);
+    private void setFocus(JButton button) {
+        this.getRootPane().setDefaultButton(button);
+        button.requestFocus();
     }
     
     private JFileChooser fileChooser;
