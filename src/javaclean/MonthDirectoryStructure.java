@@ -29,7 +29,7 @@ public class MonthDirectoryStructure extends DirectoryStructure {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);
             long month = fileAttributes.lastModifiedTime().toMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM");
+            SimpleDateFormat sdf = new SimpleDateFormat("M");
             return sdf.format(month);
         }
         catch(IOException e){
