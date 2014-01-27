@@ -14,7 +14,8 @@
     <resources>
         <j2se version="1.7+"/>
         <jar href="JavaClean.jar" main="true"/>
-    </resources>
+    <jar href="lib/AbsoluteLayout.jar"/>
+</resources>
     <application-desc main-class="javaclean.JavaClean">
     </application-desc>
 </jnlp>

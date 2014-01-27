@@ -119,13 +119,22 @@ public class XMLConfigReader {
         String propertyName = property.getNodeName().toLowerCase();
         String propertyValue = property.getTextContent();
         
-        if(propertyName.equals("contains"))
-            return new ContainsFileProperty(propertyValue);
-        else if(propertyName.equals("startswith"))
-            return new StartsWithFileProperty(propertyValue);
-        else if(propertyName.equals("filetype"))
-            return new FileTypeFileProperty(propertyValue);
-        else
-            return null;
+        if(propertyName.equals("fileproperty") && property.hasAttributes()) {
+            Node typeNode = property.getAttributes().getNamedItem("type");
+            if(typeNode != null) {
+                String typeValue = typeNode.getNodeValue().toLowerCase();
+                switch (typeValue) {
+                    case "contains":
+                        return new ContainsFileProperty(propertyValue);
+                    case "startswith":
+                        return new StartsWithFileProperty(propertyValue);
+                    case "filetype":
+                        return new FileTypeFileProperty(propertyValue);
+                    default:
+                        return null;
+                }
+            }
+        }
+        return null;
     }
 }
