@@ -6,26 +6,30 @@
 
 package javaclean;
 
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+import javax.swing.SwingWorker;
 /**
  *
  * @author ericlee
  */
-public class FileMover {
+public class FileMover extends SwingWorker{
     
     protected DirectoryStructure dirStructure;
     protected String sourcePath;
     protected String destinationPath;
+    protected ArrayList<Path> filesToMove = new ArrayList<Path>();
+    protected FileMoverInterface delegate;
     
-    public FileMover(DirectoryStructure dirStructure, String sourcePath, String destinationPath) {
+    public FileMover(DirectoryStructure dirStructure, String sourcePath, String destinationPath, FileMoverInterface delegate) {
         this.dirStructure = dirStructure;
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
-    }
-    
-    public void moveFiles() {
+        this.delegate = delegate;
+        
         Path sourceDir = Paths.get(this.sourcePath + "/");
         DirectoryStream<Path> stream;
         try {
@@ -34,12 +38,24 @@ public class FileMover {
             for(Path currentFile : stream) {
                 BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
                 if(!fileAttributes.isDirectory()) {
-                    this.processFile(currentFile);
+                    this.filesToMove.add(currentFile);
                 }
             }
         }
         catch(IOException | DirectoryIteratorException e) {
             System.err.println(e);
+        }
+    }
+    
+    public void moveFiles() {
+        int filesToMove = this.filesToMove.size();
+        int completedFiles = 0;
+        this.setProgress(0);
+        for(Path currentFile : this.filesToMove) {
+            this.processFile(currentFile);
+            
+            completedFiles++;
+            this.setProgress((completedFiles / filesToMove) * 100);
         }
     }
     
@@ -55,5 +71,15 @@ public class FileMover {
                 System.err.println(e);
             }
         }
+    }
+    
+    protected Void doInBackground(){
+        this.delegate.moveFilesStarted();
+        this.moveFiles();
+        return null;
+    }
+    
+    protected void done() {
+        this.delegate.moveFilesCompleted();
     }
 }

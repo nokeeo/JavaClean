@@ -6,13 +6,18 @@
 
 package javaclean;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import javax.swing.*;
 /**
  *
  * @author ericlee
  */
-public class SelectPathsFrame extends javax.swing.JFrame {
+public class SelectPathsFrame extends javax.swing.JFrame implements PropertyChangeListener, FileMoverInterface{
     
     /**
      * Creates new form SelectPathsFrame
@@ -229,8 +234,11 @@ public class SelectPathsFrame extends javax.swing.JFrame {
         
         if(this.checkTextFields()) {
             DirectoryStructure dirStructure = XMLConfigReader.parseFile(configPath);
-            FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath);
-            fileMover.moveFiles();
+            FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath, this);
+            this.progressDialog = this.showProgressDialog();
+            
+            fileMover.addPropertyChangeListener(this);
+            fileMover.execute();
         }
         
         else {
@@ -281,12 +289,70 @@ public class SelectPathsFrame extends javax.swing.JFrame {
             return true;
     }
     
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("progress")) {
+            int progress = (Integer) evt.getNewValue();
+            progressBar.setValue(progress);
+        }
+    }
+ 
+    public void moveFilesCompleted() {
+        this.progressDialog.dispose();
+        this.enableButtons();
+    }
+    
+    public void moveFilesStarted() {
+        this.disableButtons();
+    }
+    
+    private void disableButtons() {
+        this.clearButton.setEnabled(false);
+        this.exitButton.setEnabled(false);
+        this.selectConfigButton.setEnabled(false);
+        this.selectDestinationButton.setEnabled(false);
+        this.selectSourceButton.setEnabled(false);
+        this.sortButton.setEnabled(false);
+    }
+    
+    private void enableButtons() {
+        this.clearButton.setEnabled(true);
+        this.exitButton.setEnabled(true);
+        this.selectConfigButton.setEnabled(true);
+        this.selectDestinationButton.setEnabled(true);
+        this.selectSourceButton.setEnabled(true);
+        this.sortButton.setEnabled(true);
+    }
+    
     private void setFocus(JButton button) {
         this.getRootPane().setDefaultButton(button);
         button.requestFocus();
     }
     
+    private JDialog showProgressDialog() {
+        this.progressBar = new JProgressBar(0, 100);
+        progressBar.setPreferredSize(new Dimension(175,20));
+        progressBar.setString("Moving");
+        progressBar.setStringPainted(true);
+        progressBar.setValue(0);
+        
+        JLabel progressLabel = new JLabel("Progress: ");
+        
+        JPanel dialogPanel = new JPanel();
+        dialogPanel.add(progressLabel);
+        dialogPanel.add(progressBar);
+        
+        JDialog dialog = new JDialog((JFrame)null, "The Computer Gnomes are moving your files...");
+        dialog.getContentPane().add(dialogPanel);
+        dialog.pack();
+        dialog.toFront();
+        dialog.setVisible(true);
+        
+        return dialog;
+    }
+    
     private JFileChooser fileChooser;
+    private JProgressBar progressBar;
+    private JDialog progressDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearButton;
     private javax.swing.JLabel configPathLabel;
@@ -301,4 +367,5 @@ public class SelectPathsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel sourcePathLabel;
     private javax.swing.JTextField sourcePathTextField;
     // End of variables declaration//GEN-END:variables
+
 }
