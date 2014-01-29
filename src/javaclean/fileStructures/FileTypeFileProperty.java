@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.fileStructures;
 
+import javaclean.fileStructures.FileProperty;
 import java.nio.file.*;
 
 /**

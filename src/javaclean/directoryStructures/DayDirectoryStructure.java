@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.directoryStructures;
 
+import javaclean.directoryStructures.DirectoryStructure;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +17,8 @@ import java.text.SimpleDateFormat;
  *
  * @author ericlee
  */
-public class MonthDirectoryStructure extends DirectoryStructure {
-    public MonthDirectoryStructure(String directoryName) {
+public class DayDirectoryStructure extends DirectoryStructure {
+    public DayDirectoryStructure(String directoryName) {
         super(directoryName);
     }
     
@@ -28,9 +29,9 @@ public class MonthDirectoryStructure extends DirectoryStructure {
     protected String getCurrentDirectoryName(Path originalPath) {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);
-            long month = fileAttributes.lastModifiedTime().toMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("M");
-            return sdf.format(month);
+            long year = fileAttributes.lastModifiedTime().toMillis();
+            SimpleDateFormat sdf = new SimpleDateFormat("d");
+            return sdf.format(year);
         }
         catch(IOException e){
             System.err.println(e);

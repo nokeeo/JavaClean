@@ -4,10 +4,11 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.directoryStructures;
 
 import java.nio.file.Path;
 import java.util.*;
+import javaclean.fileStructures.FileStructure;
 
 /**
  *
@@ -53,6 +54,14 @@ public abstract class DirectoryStructure {
             return null;
         return getCurrentDirectoryName(originalPath) + "/" + nextPath;
         
+    }
+    
+    public void addSubDirectory(DirectoryStructure dirStruct) {
+        this.subDirectories.add(dirStruct);
+    }
+    
+    public void addFileStructure(FileStructure fileStruct) {
+        this.fileStructures.add(fileStruct);
     }
     
     private boolean checkFileStructures(Path originalPath) {

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.fileStructures;
 
 import java.nio.file.*;
 /**

@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.directoryStructures;
 
+import javaclean.directoryStructures.DirectoryStructure;
 import java.nio.file.Path;
 
 /**

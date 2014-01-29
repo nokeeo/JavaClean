@@ -6,6 +6,17 @@
 
 package javaclean;
 
+import javaclean.fileStructures.StartsWithFileProperty;
+import javaclean.fileStructures.FileTypeFileProperty;
+import javaclean.fileStructures.FileProperty;
+import javaclean.fileStructures.ContainsFileProperty;
+import javaclean.fileStructures.FileStructure;
+import javaclean.directoryStructures.DayDirectoryStructure;
+import javaclean.directoryStructures.FileTypeDirectoryStructure;
+import javaclean.directoryStructures.FolderDirectoryStructure;
+import javaclean.directoryStructures.MonthDirectoryStructure;
+import javaclean.directoryStructures.YearDirectoryStructure;
+import javaclean.directoryStructures.DirectoryStructure;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.*;
@@ -46,13 +57,13 @@ public class XMLConfigReader {
                 DirectoryStructure dirStructure = null;
                 if(typeNode != null) {
                     dirStructure = getDirectoryStructureForType(node, typeNode);
-                    directory.subDirectories.add(dirStructure);
+                    directory.addSubDirectory(dirStructure);
                 }
                 else {
                     Node nameNode = node.getAttributes().getNamedItem("name");
                     if(nameNode != null) {
                         dirStructure = new FolderDirectoryStructure(nameNode.getNodeValue());
-                        directory.subDirectories.add(dirStructure);
+                        directory.addSubDirectory(dirStructure);
                     }
                     else {
                         System.err.println("The directory element at " + node.getUserData("lineNumber") + " must have a name");
@@ -65,7 +76,7 @@ public class XMLConfigReader {
         
         else if(node.getNodeName().equals("file")) {
             FileStructure newFileStructure = parseFileNode(node);
-            directory.fileStructures.add(newFileStructure);
+            directory.addFileStructure(newFileStructure);
         }
         return directory;
     }
@@ -76,7 +87,7 @@ public class XMLConfigReader {
         for(int i = 0; i < fileProperties.getLength(); i++) {
             FileProperty newProperty = parseFilePropertyNode(fileProperties.item(i));
             if(newProperty != null)
-                file.properties.add(newProperty);
+                file.addFileProperty(newProperty);
         }
         return file;
     }

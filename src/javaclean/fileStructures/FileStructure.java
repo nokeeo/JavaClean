@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.fileStructures;
 
 import java.util.*;
 import java.nio.file.*;
@@ -25,5 +25,9 @@ public class FileStructure {
                 return false;
         }
         return true;
+    }
+    
+    public void addFileProperty(FileProperty fileProp) {
+        this.properties.add(fileProp);
     }
 }

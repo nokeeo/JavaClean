@@ -4,20 +4,21 @@
  * and open the template in the editor.
  */
 
-package javaclean;
+package javaclean.directoryStructures;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
+import javaclean.directoryStructures.DirectoryStructure;
+import java.io.*;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  *
  * @author ericlee
  */
-public class DayDirectoryStructure extends DirectoryStructure {
-    public DayDirectoryStructure(String directoryName) {
+public class YearDirectoryStructure extends DirectoryStructure {
+
+    public YearDirectoryStructure(String directoryName) {
         super(directoryName);
     }
     
@@ -29,7 +30,7 @@ public class DayDirectoryStructure extends DirectoryStructure {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);
             long year = fileAttributes.lastModifiedTime().toMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("d");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
             return sdf.format(year);
         }
         catch(IOException e){
