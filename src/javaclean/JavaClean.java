@@ -12,7 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  *
- * @author Home
+ * @author Eric Lee
  */
 public class JavaClean {
 

@@ -9,22 +9,34 @@ package javaclean;
 import javaclean.directoryStructures.DirectoryStructure;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
 import javax.swing.SwingWorker;
 /**
- *
- * @author ericlee
+ * Moves file to a destination folder.
+ * A delegate variable can be set that conforms to the FileMoverInterface.
+ * The method moveFilesCompleted will be called at the completion of moving the 
+ * files
+ * @author Eric Lee
  */
 public class FileMover extends SwingWorker{
-    
+    public FileMoverInterface delegate;
     protected DirectoryStructure dirStructure;
     protected String sourcePath;
     protected String destinationPath;
     protected ArrayList<Path> filesToMove = new ArrayList<Path>();
-    protected FileMoverInterface delegate;
     
+    /**
+     * @param dirStructure the directory structure the destination should adhere to 
+    * @param sourcePath the path to the files to move
+     * @param destinationPath the path to where the files should be moved
+     * @param delegate the delegate that receives all callbacks
+     */
     public FileMover(DirectoryStructure dirStructure, String sourcePath, String destinationPath, FileMoverInterface delegate) {
         this.dirStructure = dirStructure;
         this.sourcePath = sourcePath;
@@ -32,10 +44,12 @@ public class FileMover extends SwingWorker{
         this.delegate = delegate;
         
         Path sourceDir = Paths.get(this.sourcePath + "/");
+        
+        //Construct the list of all the files to move
         DirectoryStream<Path> stream;
         try {
             stream = Files.newDirectoryStream(sourceDir);
-        
+            
             for(Path currentFile : stream) {
                 BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
                 if(!fileAttributes.isDirectory()) {
@@ -48,7 +62,11 @@ public class FileMover extends SwingWorker{
         }
     }
     
-    public void moveFiles() {
+    /**
+     * Moves the files from the source to destination
+     * Keeps track of the progress of the move via SwingWorker
+     */
+    private void moveFiles() {
         int filesToMove = this.filesToMove.size();
         int completedFiles = 0;
         this.setProgress(0);
@@ -60,6 +78,10 @@ public class FileMover extends SwingWorker{
         }
     }
     
+    /**
+     * Moves an individual file.
+     * @param file file to move
+     */
     private void processFile(Path file) {
         String moveLocation = dirStructure.getNextPath(file);
         if(moveLocation != null) {
@@ -74,12 +96,21 @@ public class FileMover extends SwingWorker{
         }
     }
     
+    /**
+     * This method is called when this task is executed.
+     * Performs callback to delegate and starts moving the files.
+     * @return 
+     */
     protected Void doInBackground(){
         this.delegate.moveFilesStarted();
         this.moveFiles();
         return null;
     }
     
+    /**
+     * Runs when the files are done moving. Callsback to the delegate informing
+     * it that the files have been moved.
+     */
     protected void done() {
         this.delegate.moveFilesCompleted();
     }

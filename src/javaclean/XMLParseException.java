@@ -7,8 +7,7 @@
 package javaclean;
 
 /**
- *
- * @author ericlee
+ * @author Eric Lee
  */
 public class XMLParseException extends Exception{
     public XMLParseException(String message) {

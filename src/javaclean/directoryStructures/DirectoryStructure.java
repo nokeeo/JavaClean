@@ -66,7 +66,6 @@ public abstract class DirectoryStructure {
     
     private boolean checkFileStructures(Path originalPath) {
         boolean fileStructureCheck = false;
-        System.out.println(originalPath.getFileName().toString());
         for(FileStructure currentFileStructure : fileStructures) {
             if(currentFileStructure.checkForPathMatch(originalPath)) {
                 fileStructureCheck = true;

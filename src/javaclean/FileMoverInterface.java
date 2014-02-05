@@ -7,8 +7,8 @@
 package javaclean;
 
 /**
- *
- * @author ericlee
+ * Interface for the FileMover Delegate.
+ * @author Eric Lee
  */
 public interface FileMoverInterface {
     public void moveFilesCompleted();

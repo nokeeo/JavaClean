@@ -24,26 +24,30 @@ import javax.xml.parsers.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.w3c.dom.*;
 
 /**
- *
+ * A XML Reader that constructs the directory data structure.
  * @author ericlee
  */
 public class XMLConfigReader {
     
+    /**
+     * Parses a given XML file and returns data structure
+     * @param filename The XML file to parse
+     * @return The directory structure represented in the XML file
+     * @throws XMLParseException If the XML doc does not match the schema the
+     * method will throw a XMLParseException.
+     */
     public static DirectoryStructure parseFile(String filename) throws XMLParseException{        
         try {
             File configFile = new File(filename);
             
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(new File("src/javaclean/configSchema.xsd")));
-
-            /*SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            spf.setSchema(schema);
-            SAXParser parser = spf.newSAXParser();*/
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -52,8 +56,6 @@ public class XMLConfigReader {
             
             DocumentBuilder dBuilder = dbf.newDocumentBuilder();
             dBuilder.setErrorHandler(new XMLErrorHandler());
-            
-            //dBuilder.setErrorHandler(new XMLErrorHandler());
             
             Document parseDoc = dBuilder.parse(configFile);
             
@@ -66,7 +68,13 @@ public class XMLConfigReader {
         }
     }
     
-    public static DirectoryStructure parseDirectoryNode(Node node, DirectoryStructure directory) {
+    /**
+     * Parses a Directory Node
+     * @param node The node to parse
+     * @param directory The directory structure the directory should be added to
+     * @return the directory structure with the node added
+     */
+    private static DirectoryStructure parseDirectoryNode(Node node, DirectoryStructure directory) {
         //Parese current node
         if(node.getNodeName().equals("directory")) {
             if(node.hasAttributes()) {
@@ -87,7 +95,12 @@ public class XMLConfigReader {
         return directory;
     }
     
-    public static FileStructure parseFileNode(Node fileNode) {
+    /**
+     * Parses a file node
+     * @param fileNode The file node to parse
+     * @return The FileStructure of the file node.
+     */
+    private static FileStructure parseFileNode(Node fileNode) {
         FileStructure file = new FileStructure();
         NodeList fileProperties = fileNode.getChildNodes();
         for(int i = 0; i < fileProperties.getLength(); i++) {
@@ -98,6 +111,13 @@ public class XMLConfigReader {
         return file;
     }
     
+    /**
+     * Parses the given type of a directory node and returns the corresponding
+     * structure.
+     * @param directoryNode The directory node to get the type for
+     * @param typeNode The node of the type.
+     * @return The 
+     */
     private static DirectoryStructure getDirectoryStructureForType(Node directoryNode, Node typeNode) {
         DirectoryStructure returnStructure = null;
         String type = typeNode.getNodeValue();
@@ -133,6 +153,11 @@ public class XMLConfigReader {
         return returnStructure;
     }
     
+    /**
+     * Parses the directory's children
+     * @param parentNode The Parent XML node
+     * @param parentDirectory The Parent Directory Structure
+     */
     private static void parseDirectoryChildren(Node parentNode, DirectoryStructure parentDirectory) {
         NodeList children = parentNode.getChildNodes();
         for(int i = 0; i < children.getLength(); i++) {
@@ -141,6 +166,11 @@ public class XMLConfigReader {
         }
     }
     
+    /**
+     * Parses a File Property XML Node
+     * @param property The File Property XML Node
+     * @return A FileProperty Data Structure
+     */
     private static FileProperty parseFilePropertyNode(Node property) {
         String propertyName = property.getNodeName().toLowerCase();
         String propertyValue = property.getTextContent();
