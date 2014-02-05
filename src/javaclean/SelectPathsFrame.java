@@ -13,7 +13,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 /**
  *
  * @author ericlee
@@ -234,12 +239,17 @@ public class SelectPathsFrame extends javax.swing.JFrame implements PropertyChan
         String destinationPath = this.destinationPathTextField.getText();
         
         if(this.checkTextFields()) {
-            DirectoryStructure dirStructure = XMLConfigReader.parseFile(configPath);
-            FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath, this);
-            this.progressDialog = this.showProgressDialog();
-            
-            fileMover.addPropertyChangeListener(this);
-            fileMover.execute();
+            DirectoryStructure dirStructure;
+            try {
+                dirStructure = XMLConfigReader.parseFile(configPath);
+                FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath, this);
+                this.progressDialog = this.showProgressDialog();
+                fileMover.addPropertyChangeListener(this);
+                fileMover.execute();
+            }
+            catch(XMLParseException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "The computer elfs have encounterd a problem with your XML", JOptionPane.ERROR_MESSAGE);
+            }
         }
         
         else {
@@ -260,7 +270,6 @@ public class SelectPathsFrame extends javax.swing.JFrame implements PropertyChan
         this.configPathTextField.setText("");
         
         //Reset the JFileChooser
-        this.fileChooser = new JFileChooser();
     }//GEN-LAST:event_clearButtonActionPerformed
 
     

@@ -19,7 +19,11 @@ import javaclean.directoryStructures.YearDirectoryStructure;
 import javaclean.directoryStructures.DirectoryStructure;
 import java.io.File;
 import java.io.IOException;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 
@@ -29,11 +33,27 @@ import org.w3c.dom.*;
  */
 public class XMLConfigReader {
     
-    public static DirectoryStructure parseFile(String filename) {
+    public static DirectoryStructure parseFile(String filename) throws XMLParseException{        
         try {
             File configFile = new File(filename);
+            
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new StreamSource(new File("src/javaclean/configSchema.xsd")));
+
+            /*SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            spf.setSchema(schema);
+            SAXParser parser = spf.newSAXParser();*/
+            
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            dbf.setValidating(false);
+            dbf.setSchema(schema);
+            
             DocumentBuilder dBuilder = dbf.newDocumentBuilder();
+            dBuilder.setErrorHandler(new XMLErrorHandler());
+            
+            //dBuilder.setErrorHandler(new XMLErrorHandler());
             
             Document parseDoc = dBuilder.parse(configFile);
             
@@ -41,12 +61,9 @@ public class XMLConfigReader {
             return XMLConfigReader.parseDirectoryNode(root, new FolderDirectoryStructure(""));
             
         } 
-        
-        catch (ParserConfigurationException | SAXException | IOException e) {
-            System.err.println(e);
+        catch (SAXException | ParserConfigurationException | IOException e) {
+            throw new XMLParseException(e.getMessage());
         }
-        
-        return null;
     }
     
     public static DirectoryStructure parseDirectoryNode(Node node, DirectoryStructure directory) {
@@ -59,17 +76,6 @@ public class XMLConfigReader {
                     dirStructure = getDirectoryStructureForType(node, typeNode);
                     directory.addSubDirectory(dirStructure);
                 }
-                else {
-                    Node nameNode = node.getAttributes().getNamedItem("name");
-                    if(nameNode != null) {
-                        dirStructure = new FolderDirectoryStructure(nameNode.getNodeValue());
-                        directory.addSubDirectory(dirStructure);
-                    }
-                    else {
-                        System.err.println("The directory element at " + node.getUserData("lineNumber") + " must have a name");
-                    }
-                }
-                
                 parseDirectoryChildren(node, dirStructure);
             }
         }
@@ -114,6 +120,15 @@ public class XMLConfigReader {
         
         else if(type.equals("day"))
             returnStructure = new DayDirectoryStructure(null);
+        else if(type.equals("folder")) {
+             Node nameNode = directoryNode.getAttributes().getNamedItem("name");
+             if(nameNode != null) {
+                 returnStructure = new FolderDirectoryStructure(nameNode.getNodeValue());
+             }
+             
+             else
+                 System.out.println("Folder directory needs a name!");
+        }
         
         return returnStructure;
     }
@@ -141,8 +156,6 @@ public class XMLConfigReader {
                         return new StartsWithFileProperty(propertyValue);
                     case "filetype":
                         return new FileTypeFileProperty(propertyValue);
-                    default:
-                        return null;
                 }
             }
         }
