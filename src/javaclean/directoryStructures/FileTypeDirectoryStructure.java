@@ -11,12 +11,16 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
- *
- * @author ericlee
+ * A directory for a set of pre-set of file types(Video, Images, Audio, or Documents)
+ * @author Eric Lee
  */
 public class FileTypeDirectoryStructure extends DirectoryStructure {
     private String[] fileTypes;
-        
+    
+    /**
+     * @param directoryName Custom name of the directory
+     * @param type the type of the file directory(Video, Images, Audio, or Documents)
+     */
     public FileTypeDirectoryStructure(String directoryName, String type){
         super(directoryName);
         
@@ -30,6 +34,11 @@ public class FileTypeDirectoryStructure extends DirectoryStructure {
             this.fileTypes = this.getDocumentFileTypes();
     }
     
+    /**
+     * Checks to see if the file's extention matches the type
+     * @param originalPath The path of the file to check
+     * @return True if the path matches
+     */
     public boolean checkForPathMatch(Path originalPath) {
         String currentFileName = originalPath.getFileName().toString();
         int fileExtIndex = currentFileName.lastIndexOf(".");
@@ -41,10 +50,19 @@ public class FileTypeDirectoryStructure extends DirectoryStructure {
         }
     }
     
+    /**
+     * Gets the name of the directory
+     * @param originalPath Path to the file to check
+     * @return The directory name
+     */
     protected String getCurrentDirectoryName(Path originalPath) {
         return this.directoryName;
     }
     
+    /**
+     * Gets the video file formats
+     * @return Array of strings of file types (note "." is included)
+     */
     private String[] getVideoFileTypes() {
         return new String[]{
             ".aaf",
@@ -85,6 +103,10 @@ public class FileTypeDirectoryStructure extends DirectoryStructure {
         }; 
     }
     
+    /**
+     * Returns the picture file types
+     * @return An Array of strings of picture file types
+     */
     private String[] getPictureFileTypes() {
         return new String[] {
             ".ase",
@@ -157,6 +179,10 @@ public class FileTypeDirectoryStructure extends DirectoryStructure {
         };
     }
     
+    /**
+     * Gets the audio file types
+     * @return An Array of strings of audio types
+     */
     private String[] getAudioFileTypes() {
         return new String[] {
             ".8svx",
@@ -220,6 +246,10 @@ public class FileTypeDirectoryStructure extends DirectoryStructure {
         };
     }
     
+    /**
+     * Gets the document file types
+     * @return An Array of string of document file types
+     */
     private String[] getDocumentFileTypes() {
         return new String[] {
             ".602",

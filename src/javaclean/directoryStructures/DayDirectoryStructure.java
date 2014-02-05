@@ -6,7 +6,6 @@
 
 package javaclean.directoryStructures;
 
-import javaclean.directoryStructures.DirectoryStructure;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,18 +13,30 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 
 /**
- *
- * @author ericlee
+ * Represents a directory where all the contents were last modified on the same
+ * day.
+ * @author Eric Lee
  */
 public class DayDirectoryStructure extends DirectoryStructure {
     public DayDirectoryStructure(String directoryName) {
         super(directoryName);
     }
     
+    /**
+     * Always returns true, because all files were modified on a date.
+     * @param originalPath The path of the file to check
+     * @return True if the check is successful 
+     */
     public boolean checkForPathMatch(Path originalPath) {
         return true;
     }
     
+    /**
+     * Gets the name of the directory which will be the numeric representation
+     * of the day
+     * @param originalPath the path to the file
+     * @return Returns the name of the directory.
+     */
     protected String getCurrentDirectoryName(Path originalPath) {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);
