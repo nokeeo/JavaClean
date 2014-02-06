@@ -6,7 +6,6 @@
 
 package javaclean.directoryStructures;
 
-import javaclean.directoryStructures.DirectoryStructure;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,18 +13,28 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 
 /**
- *
- * @author ericlee
+ * A directory structure for all files within a month.
+ * @author Eric Lee
  */
 public class MonthDirectoryStructure extends DirectoryStructure {
     public MonthDirectoryStructure(String directoryName) {
         super(directoryName);
     }
     
+    /**
+     * Always returns true because all files have a last modified month
+     * @param originalPath
+     * @return 
+     */
     public boolean checkForPathMatch(Path originalPath) {
         return true;
     }
     
+    /**
+     * Gets the numeric representation for the directories month
+     * @param originalPath
+     * @return 
+     */
     protected String getCurrentDirectoryName(Path originalPath) {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);

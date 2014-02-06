@@ -10,14 +10,19 @@ import javaclean.directoryStructures.DirectoryStructure;
 import java.nio.file.Path;
 
 /**
- *
- * @author ericlee
+ * A simple folder directory structure
+ * @author Eric Lee
  */
 public class FolderDirectoryStructure extends DirectoryStructure {
     public FolderDirectoryStructure(String directoryName) {
         super(directoryName);
     }
     
+    /**
+     * Always returns true b/c all files can belong in a simple directory
+     * @param originalPath
+     * @return 
+     */
     public boolean checkForPathMatch(Path originalPath) {
         return true;
     }

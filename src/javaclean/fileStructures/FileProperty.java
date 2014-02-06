@@ -8,9 +8,14 @@ package javaclean.fileStructures;
 
 import java.nio.file.*;
 /**
- *
- * @author ericlee
+ * Abstract class of a file property.
+ * @author Eric Lee
  */
 public abstract class FileProperty {
+    /**
+     * Check if the given path is a match with the file property.
+     * @param originalPath
+     * @return 
+     */
     abstract boolean checkForPathMatch(Path originalPath);
 }

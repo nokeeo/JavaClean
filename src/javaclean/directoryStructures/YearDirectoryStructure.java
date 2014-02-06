@@ -6,15 +6,13 @@
 
 package javaclean.directoryStructures;
 
-import javaclean.directoryStructures.DirectoryStructure;
 import java.io.*;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- *
- * @author ericlee
+ * @author Eric Lee
  */
 public class YearDirectoryStructure extends DirectoryStructure {
 
@@ -22,10 +20,20 @@ public class YearDirectoryStructure extends DirectoryStructure {
         super(directoryName);
     }
     
+    /**
+     * Always returns true because all files have a last modified year
+     * @param originalPath
+     * @return 
+     */
     public boolean checkForPathMatch(Path originalPath) {
         return true;
     }
     
+    /**
+     * Returns the year of the year directory.
+     * @param originalPath
+     * @return 
+     */
     protected String getCurrentDirectoryName(Path originalPath) {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(originalPath, BasicFileAttributes.class);

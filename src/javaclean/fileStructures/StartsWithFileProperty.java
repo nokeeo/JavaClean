@@ -6,19 +6,26 @@
 
 package javaclean.fileStructures;
 
-import javaclean.fileStructures.FileProperty;
-import java.nio.file.*;
+import java.nio.file.Path;
 /**
- *
- * @author ericlee
+ * Creates a file property to check if a file starts with a value
+ * @author Eric Lee
  */
 public class StartsWithFileProperty extends FileProperty {
-    private String startsWithValue;
+    private final String startsWithValue;
     
+    /**
+     * @param startsWithValue Value the file should start with 
+     */
     public StartsWithFileProperty(String startsWithValue) {
         this.startsWithValue = startsWithValue;
     }
     
+    /**
+     * Checks to see if a given file starts with the value.
+     * @param originalPath The path to check with
+     * @return true if the file starts with the value
+     */
     public boolean checkForPathMatch(Path originalPath) {
         String fileName = originalPath.getFileName().toString();
         return fileName.startsWith(this.startsWithValue);

@@ -6,20 +6,28 @@
 
 package javaclean.fileStructures;
 
-import javaclean.fileStructures.FileProperty;
-import java.nio.file.*;
+import java.nio.file.Path;
+
 
 /**
- *
- * @author ericlee
+ * File property for a given file extension.
+ * @author Eric Lee
  */
 public class FileTypeFileProperty extends FileProperty{
-    private String propertyFileExt;
+    private final String propertyFileExt;
     
+    /**
+     * @param fileExt File extension of the property
+     */
     public FileTypeFileProperty(String fileExt) {
         this.propertyFileExt = fileExt;
     }
     
+    /**
+     * Checks to see if a given file has a certain file type
+      * @param originalPath The path to check with
+     * @return true if the property is a match
+     */
     public boolean checkForPathMatch(Path originalPath) {
         String fileName = originalPath.getFileName().toString();
         int fileExtIndex = fileName.lastIndexOf(".");

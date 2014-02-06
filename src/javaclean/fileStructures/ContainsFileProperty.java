@@ -8,16 +8,24 @@ package javaclean.fileStructures;
 
 import java.nio.file.*;
 /**
- *
- * @author ericlee
+ * Checks if a file name contains a certain value.
+ * @author Eric Lee
  */
 public class ContainsFileProperty extends FileProperty {
-    private String containsValue;
+    private final String containsValue;
     
+    /**
+     * @param the value that the file name must include 
+     */
     public ContainsFileProperty(String containsValue) {
         this.containsValue = containsValue;
     }
     
+    /**
+     * Checks if the file name contains a given value
+     * @param originalPath The path to check
+     * @return true if the file name contains that value.
+     */
     public boolean checkForPathMatch(Path originalPath) {
         String fileName = originalPath.getFileName().toString();
         return fileName.contains(this.containsValue);
