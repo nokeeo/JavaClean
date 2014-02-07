@@ -22,3 +22,10 @@ Example:
 ```xml
 <directory type="folder" name="the-name-of-the-directory" />
 ```
+
+#### Dynamically Named Directories
+The name of directories can also be created on the fly.  An example of this is the year directory type. All files from that year will be sorted into the directory.  The name attribute is not necessary and will be ignored.<br />
+Example:
+```xml
+<directory type="year" />
+```
