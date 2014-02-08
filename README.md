@@ -104,3 +104,19 @@ Sorts all document files(pdf, doc, ppt, etc) into this folder.
 ```xml
 <directory type="document" />
 ```
+### File Property Tags
+#### Contains
+The file name contains a specified value.
+```xml
+<fileProperty type="contains">example</fileProperty>
+```
+#### File Type
+The file has the specified extension.
+```xml
+<fileProperty type="fileType">doc</fileProperty>
+```
+#### Starts With
+The file starts with the specified value.
+```xml
+<fileProperty type="startsWith">startWithValue</fileProperty>
+```
