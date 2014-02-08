@@ -50,7 +50,7 @@ A file can also contain more than one fileProperty tag. For example:
 </directory>
 ```
 The directory will contain all files with the file type png and start with the letter 'a'.<br />
-A directory can also have more than one file. For example:
+A directory can also have more than one file tag. For example:
 ```xml
 <directory type="folder" name="Example Directory">
   <file>
@@ -62,3 +62,45 @@ A directory can also have more than one file. For example:
 </directory>
 ```
 The directory will contain all files with the file type png or gif.<br />
+
+XML Tags
+--------
+### Dynamically named Directory Tags
+For all dynamically named directory tags the name attribute will be ignored.
+#### Year
+Sorts files into directories with the names of the years the files were last modified.
+```xml
+<directory type="year" />
+```
+#### Month
+Sorts files into directories with the numeric values of the months the files were last modified.
+```xml
+<directory type="month" />
+```
+#### Day
+Sorts files into directories with the numeric values of the days the files were last modified.
+```xml
+<directory type="day" />
+```
+### Preset Directory Tags
+For all preset directory tags the name attribute is optional. If no name attribute is provided the name of the directory will be the name of the preset tag.
+#### Video
+Sorts all video files into this folder.
+```xml
+<directory type="video" />
+```
+#### Pictures
+Sorts all image files into this folder.
+```xml
+<directory type="picture" />
+```
+#### Audio
+Sorts all audio files into this folder.
+```xml
+<directory type="audio" />
+```
+#### Documents
+Sorts all document files(pdf, doc, ppt, etc) into this folder.
+```xml
+<directory type="document" />
+```
