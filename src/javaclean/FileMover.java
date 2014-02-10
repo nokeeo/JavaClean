@@ -7,7 +7,6 @@
 package javaclean;
 
 import javaclean.directoryStructures.DirectoryStructure;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;

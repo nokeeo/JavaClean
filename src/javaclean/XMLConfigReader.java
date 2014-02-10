@@ -47,7 +47,7 @@ public class XMLConfigReader {
             File configFile = new File(filename);
             
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new StreamSource(new File("src/javaclean/configSchema.xsd")));
+            Schema schema = factory.newSchema(new StreamSource(new File("./configSchema.xsd")));
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
