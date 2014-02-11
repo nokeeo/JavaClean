@@ -50,14 +50,17 @@ public abstract class DirectoryStructure {
      */
     public String getNextPath(Path originalPath) {
         
+        //If there are file structures check for match on the file structures
         if(!fileStructures.isEmpty()) {
             if(!checkFileStructures(originalPath))
                 return null;
         }
         
+        //If there are no subdirectories a match is found
         if(subDirectories.isEmpty())
             return getCurrentDirectoryName(originalPath) + "/";
         
+        //Else check subdirectories for a match
         boolean matchFound = true;
         String nextPath = null;
         for(DirectoryStructure subDirectory : subDirectories) { 
