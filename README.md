@@ -10,6 +10,22 @@ configSchema.xsd file must be in the root directory.
 #### Tested on:
 OSX 10.9
 
+Running the Application via the Command Line
+--------
+Provide the arguments in the order of: <br />
+1. Configuration file path <br />
+2. Source Directory <br />
+3. Destination Directory <br />
+
+If no arguments are provide the application will launch a GUI.
+
+Automation
+--------
+####Mac
+javaclean.sh file in supportFiles directory provides the necessary operations required to automate running the application. In the file change the bash variables to the desired paths and files.
+
+After change the path of the javaclean.sh file in the automator workflow to the location of the edited javaclean.sh file. The automator event can then be opened by a recurring iCal event.
+
 XML Overview
 --------
 There are three main tags in the XML Directory Structure. The three tags are directory, file, and fileProperty.
