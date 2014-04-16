@@ -8,17 +8,10 @@ package javaclean;
 
 import javaclean.directoryStructures.DirectoryStructure;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 /**
  *
  * @author ericlee
@@ -242,7 +235,8 @@ public class SelectPathsFrame extends javax.swing.JFrame implements PropertyChan
             DirectoryStructure dirStructure;
             try {
                 dirStructure = XMLConfigReader.parseFile(configPath);
-                FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath, this);
+                FileMover fileMover = new FileMover(dirStructure, sourcePath, destinationPath);
+                fileMover.delegate = this;
                 this.progressDialog = this.showProgressDialog();
                 fileMover.addPropertyChangeListener(this);
                 fileMover.execute();

@@ -25,22 +25,24 @@ import javax.swing.SwingWorker;
  */
 public class FileMover extends SwingWorker{
     public FileMoverInterface delegate;
+    public boolean verbose;
+    
     protected DirectoryStructure dirStructure;
     protected String sourcePath;
     protected String destinationPath;
     protected ArrayList<Path> filesToMove = new ArrayList<Path>();
     
+    
     /**
      * @param dirStructure the directory structure the destination should adhere to 
     * @param sourcePath the path to the files to move
      * @param destinationPath the path to where the files should be moved
-     * @param delegate the delegate that receives all callbacks
      */
-    public FileMover(DirectoryStructure dirStructure, String sourcePath, String destinationPath, FileMoverInterface delegate) {
+    public FileMover(DirectoryStructure dirStructure, String sourcePath, String destinationPath) {
         this.dirStructure = dirStructure;
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
-        this.delegate = delegate;
+        this.verbose = false;
         
         Path sourceDir = Paths.get(this.sourcePath + "/");
         
@@ -88,6 +90,8 @@ public class FileMover extends SwingWorker{
             try {
                 Files.createDirectories(movePath);
                 Files.move(file, Paths.get(this.destinationPath + "/" + moveLocation + file.getFileName().toString()));
+                if(verbose)
+                    System.out.println("Moved " + file.toString());
             }
             catch(IOException e) {
                 System.err.println(e);
@@ -101,7 +105,9 @@ public class FileMover extends SwingWorker{
      * @return 
      */
     protected Void doInBackground(){
-        this.delegate.moveFilesStarted();
+        if(delegate != null)
+            delegate.moveFilesStarted();
+        
         this.moveFiles();
         return null;
     }
@@ -111,6 +117,7 @@ public class FileMover extends SwingWorker{
      * it that the files have been moved.
      */
     protected void done() {
-        this.delegate.moveFilesCompleted();
+        if(delegate != null)
+            this.delegate.moveFilesCompleted();
     }
 }

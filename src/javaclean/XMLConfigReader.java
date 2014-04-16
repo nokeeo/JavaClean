@@ -147,7 +147,7 @@ public class XMLConfigReader {
              }
              
              else
-                 System.out.println("Folder directory needs a name!");
+                 System.out.println("All Folder directory needs a name!");
         }
         
         return returnStructure;

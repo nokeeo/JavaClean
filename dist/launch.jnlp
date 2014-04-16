@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp codebase="file:/Volumes/Media/Documents/Projects/JavaClean/dist/" href="launch.jnlp" spec="1.0+">
+    <information>
+        <title>JavaClean</title>
+        <vendor>Home</vendor>
+        <homepage href=""/>
+        <description>JavaClean</description>
+        <description kind="short">JavaClean</description>
+    </information>
+    <update check="always"/>
+    <security>
+<all-permissions/>
+</security>
+    <resources>
+        <j2se version="1.7+"/>
+        <jar href="JavaClean.jar" main="true"/>
+    <jar href="lib/AbsoluteLayout.jar"/>
+</resources>
+    <application-desc main-class="javaclean.JavaClean">
+    </application-desc>
+</jnlp>
