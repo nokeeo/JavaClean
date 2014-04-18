@@ -5,7 +5,7 @@ JavaClean is a Java Application that sorts files based on a XML file that repres
 Requirements
 --------
 Java 7 <br />
-configSchema.xsd file must be in the root directory.
+configSchema.xsd file must be in the root directory of the project or the directory of the jar file.
 
 #### Tested on:
 OSX 10.9
