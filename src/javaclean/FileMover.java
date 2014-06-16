@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.SwingWorker;
 /**
  * Moves file to a destination folder.
@@ -50,10 +51,9 @@ public class FileMover extends SwingWorker{
         DirectoryStream<Path> stream;
         try {
             stream = Files.newDirectoryStream(sourceDir);
-            
             for(Path currentFile : stream) {
                 BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
-                if(!fileAttributes.isDirectory()) {
+                if(!fileAttributes.isDirectory() || Arrays.asList(getAppleFiles()).contains(getFileExtension(currentFile))) {
                     this.filesToMove.add(currentFile);
                 }
             }
@@ -87,14 +87,8 @@ public class FileMover extends SwingWorker{
         String moveLocation = dirStructure.getNextPath(file);
         if(moveLocation != null) {
             Path movePath = Paths.get(this.destinationPath + "/" + moveLocation);
-            try {
-                Files.createDirectories(movePath);
-                Files.move(file, Paths.get(this.destinationPath + "/" + moveLocation + file.getFileName().toString()));
-                if(verbose)
-                    System.out.println("Moved " + file.toString());
-            }
-            catch(IOException e) {
-                System.err.println(e);
+            if(moveIndividualFile(file, movePath)) {
+                deleteFile(file);
             }
         }
     }
@@ -119,5 +113,63 @@ public class FileMover extends SwingWorker{
     protected void done() {
         if(delegate != null)
             this.delegate.moveFilesCompleted();
+    }
+    
+    protected String[] getAppleFiles() {
+        return new String[] {
+            ".pages",
+            ".key",
+            ".keynote",
+            ".numbers",
+            ".fcp",
+            ".band",
+            ".logic"
+        };
+    }
+    
+    protected String getFileExtension(Path file) {
+        String fileString = file.toString().toLowerCase();
+        
+        int dotIndex = fileString.lastIndexOf(".");
+        return fileString.substring(dotIndex); 
+    }
+    
+    protected boolean moveIndividualFile(Path file, Path movePath) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(file,  BasicFileAttributes.class);
+            if(attributes.isDirectory()) {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(file);
+                for(Path currentFile : stream) {
+                    moveIndividualFile(currentFile, Paths.get(movePath.toString() + "/" + file.getFileName()));
+                }
+            }
+            else {
+                 Files.createDirectories(movePath);
+                 Files.copy(file, Paths.get(movePath.toString() + "/" + file.getFileName().toString()));
+                 if(verbose)
+                    System.out.println("Moved " + file.toString());
+            }
+        }
+        catch(IOException e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+    
+    protected void deleteFile(Path file) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
+            if(attributes.isDirectory()) {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(file);
+                for(Path currentFile : stream) {
+                    deleteFile(currentFile);
+                }
+            }
+            Files.delete(file);
+        }
+        catch(IOException e) {
+            System.out.println(e);
+        }
     }
 }
