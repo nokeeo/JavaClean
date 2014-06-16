@@ -115,18 +115,6 @@ public class FileMover extends SwingWorker{
             this.delegate.moveFilesCompleted();
     }
     
-    protected String[] getAppleFiles() {
-        return new String[] {
-            ".pages",
-            ".key",
-            ".keynote",
-            ".numbers",
-            ".fcp",
-            ".band",
-            ".logic"
-        };
-    }
-    
     protected String getFileExtension(Path file) {
         String fileString = file.toString().toLowerCase();
         
@@ -171,5 +159,18 @@ public class FileMover extends SwingWorker{
         catch(IOException e) {
             System.out.println(e);
         }
+    }
+    
+     protected String[] getAppleFiles() {
+        return new String[] {
+            ".pages",
+            ".key",
+            ".keynote",
+            ".numbers",
+            ".fcp",
+            ".band",
+            ".logic",
+            ".imovieproj"
+        };
     }
 }
