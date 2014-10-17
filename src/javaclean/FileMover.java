@@ -10,6 +10,7 @@ import javaclean.directoryStructures.DirectoryStructure;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,6 +54,7 @@ public class FileMover extends SwingWorker{
             stream = Files.newDirectoryStream(sourceDir);
             for(Path currentFile : stream) {
                 BasicFileAttributes fileAttributes = Files.readAttributes(currentFile, BasicFileAttributes.class);
+                System.out.println(currentFile.toString());
                 if(!fileAttributes.isDirectory() || Arrays.asList(getAppleFiles()).contains(getFileExtension(currentFile))) {
                     this.filesToMove.add(currentFile);
                 }
@@ -87,7 +89,7 @@ public class FileMover extends SwingWorker{
         String moveLocation = dirStructure.getNextPath(file);
         if(moveLocation != null) {
             Path movePath = Paths.get(this.destinationPath + "/" + moveLocation);
-            if(moveIndividualFile(file, movePath)) {
+            if(moveIndividualFile(file, movePath, file.getFileName().toString())) {
                 deleteFile(file);
             }
         }
@@ -119,30 +121,75 @@ public class FileMover extends SwingWorker{
         String fileString = file.toString().toLowerCase();
         
         int dotIndex = fileString.lastIndexOf(".");
-        return fileString.substring(dotIndex); 
+        if(dotIndex != -1)
+            return fileString.substring(dotIndex); 
+        else
+            return "";
     }
     
-    protected boolean moveIndividualFile(Path file, Path movePath) {
+    protected boolean moveIndividualFile(Path file, Path movePath, String fileName) {
         try {
+            System.out.println(file.getFileName().toString());
             BasicFileAttributes attributes = Files.readAttributes(file,  BasicFileAttributes.class);
             if(attributes.isDirectory()) {
                 DirectoryStream<Path> stream = Files.newDirectoryStream(file);
                 for(Path currentFile : stream) {
-                    moveIndividualFile(currentFile, Paths.get(movePath.toString() + "/" + file.getFileName()));
+                    moveIndividualFile(currentFile, Paths.get(movePath.toString() + "/" + file.getFileName()), currentFile.getFileName().toString());
                 }
             }
             else {
                  Files.createDirectories(movePath);
-                 Files.copy(file, Paths.get(movePath.toString() + "/" + file.getFileName().toString()));
+                 Files.copy(file, Paths.get(movePath.toString() + "/" + fileName));
                  if(verbose)
                     System.out.println("Moved " + file.toString());
             }
+        }
+        catch (FileAlreadyExistsException e) {
+            return renameAndMoveFile(file, movePath, fileName);
         }
         catch(IOException e) {
             System.out.println(e);
             return false;
         }
         return true;
+    }
+    
+    protected boolean renameAndMoveFile(Path file, Path movePath, String fileNameToMove) {
+        int extentionIndex = fileNameToMove.lastIndexOf(".");
+        String fileName = fileNameToMove.substring(0, extentionIndex);
+        
+        int incrementStartIndex = fileName.lastIndexOf("(");
+        int incrementEndIndex = fileName.lastIndexOf(")");
+        String incrementStringValue = this.getNextIncrementValue(incrementStartIndex, incrementEndIndex, fileName);
+        if(incrementStringValue != null) {
+            String newFileName =  incrementStringValue + fileNameToMove.substring(extentionIndex);
+            return this.moveIndividualFile(file, movePath, newFileName);
+        }
+        else {
+            return false;
+        }
+    }
+    
+    protected String getNextIncrementValue(int start, int end, String fileName) {
+        if(start <= end && end < fileName.length()) {
+            String rawFileName = fileName;
+            if(start != -1 && end != -1) {
+                String currentIncrement = fileName.substring(start + 1, end);
+                try {
+                    int incrementValue = Integer.parseInt(currentIncrement) + 1;
+                    rawFileName = fileName.substring(0, start);
+                    return rawFileName + "(" + Integer.toString(incrementValue) + ")";
+                }
+                catch(NumberFormatException e) {
+                    return rawFileName + "(1)";
+                }
+            }
+            else {
+                return rawFileName + "(1)";
+            }
+        }
+        
+        return null;
     }
     
     protected void deleteFile(Path file) {
